@@ -203,10 +203,10 @@ export default function SignUpForm() {
                         onChange={(e) =>
                           setFormData({ ...formData, password: e.target.value })
                         }
-                        className="rounded-lg f px-3 w-[80%] focus:outline-none"
+                        className="rounded-lg px-3 w-[80%] focus:outline-none"
                       />
 
-                      {passwordToggle ? (
+                      {passwordToggle.password ? (
                         <FaEye
                           onClick={() => handlePasswordToggle("password")}
                           className="text-gray-400 cursor-pointer"
@@ -232,7 +232,7 @@ export default function SignUpForm() {
                           passwordToggle.confirmPassword ? "text" : "password"
                         }
                         required
-                        className="rounded-lg f px-3 w-[80%] focus:outline-none"
+                        className="rounded-lg px-3 w-[80%] focus:outline-none"
                       />
 
                       {passwordToggle.confirmPassword ? (
