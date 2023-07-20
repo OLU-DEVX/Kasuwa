@@ -20,10 +20,10 @@ export default function SignUpForm() {
         `${API_BASE_URL}users/register`,
         formData
       );
-      console.log("Signup successful", response);
+      // Signup successful
       router.push("/");
     } catch (error) {
-      console.log("Signup error", error);
+      // Handle signup error
       setLoading("failed");
     }
   };
@@ -64,7 +64,7 @@ export default function SignUpForm() {
       ...prev,
       [field]: !prev[field],
     }));
-    console.log("Clicked");
+    // Toggle password visibility
   };
 
   return (
@@ -107,6 +107,7 @@ export default function SignUpForm() {
                         setFormData({ ...formData, first_name: e.target.value })
                       }
                       required
+                      aria-label="First Name"
                       className="border border-[#ccc] rounded-lg h-12 px-3 w-full focus:outline-none focus:border-[#A46E05]"
                     />
                   </div>
@@ -123,6 +124,7 @@ export default function SignUpForm() {
                         setFormData({ ...formData, last_name: e.target.value })
                       }
                       required
+                      aria-label="Last Name"
                       className="border border-[#ccc] rounded-lg h-12 px-3 w-full focus:outline-none focus:border-[#A46E05]"
                     />
                   </div>
