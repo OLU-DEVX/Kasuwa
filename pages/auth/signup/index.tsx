@@ -16,7 +16,7 @@ export default function SignUpForm() {
     e.preventDefault();
     setLoading("loading");
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}users/register`,
         formData
       );
