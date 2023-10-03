@@ -15,4 +15,50 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+body{
+  background: rgb(248, 248, 248);
+}
+.blend{
+  background-position: right;
+  background-image: url(../public/Cloth\ sack\ on\ white.svg);
+}
 
+.scroll-parent {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  overflow-x: hidden;
+}
+
+.scroll-element {
+  width: inherit;
+  height: inherit;
+  position:relative;
+  left: 0%;
+  top: 0%;
+  animation: primary 10s linear infinite;
+}
+
+@keyframes primary {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 100%;
+  }
+}
+@media (max-width:500px) {
+  .cartItem{
+flex-direction: column;
+}
+.goods{
+}
+.cartItem img{
+  width: 100%;
+  height: 200px;
+  max-width: unset;
+}
+.goods div{
+  width: 100%;
+}
+}
