@@ -50,7 +50,7 @@ export default function Nav() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const filteredList = list.filter((item: any) => {
-    return item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return item.name.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const handleSearchChange = (event: any) => {
@@ -71,11 +71,11 @@ export default function Nav() {
   return (
     <Navbar
       maxWidth="xl"
-      className="justify-around shadow px-3 bg-white p-0 sm:px-6 top-[0]"
+      className="justify-around shadow px-3 bg-white p-0 md:px-6 top-[0]"
     >
       {router.pathname.includes("/seller") && (
         <NavbarMenuToggle
-          className="flex sm:hidden"
+          className="flex md:hidden"
           onClick={() => {
             setIsNavOpen(!isNavOpen);
           }}
@@ -90,7 +90,7 @@ export default function Nav() {
         <Image src={logo} alt="logo" width={35} height={45} />
         <p className="flex text-3xl font-bold text-[#A46E05] ">KASUWA</p>
       </NavbarBrand>
-      <NavbarContent className="sm:flex-grow-[1] flex-grow-[1.2] ">
+      <NavbarContent className="md:flex-grow-[1] flex-grow-[1.2] ">
         <NavbarItem
           className="bg-white rounded-md md:m-0 ml-auto border md:w-full w-[50px] cursor-pointer"
           onClick={onOpen}
@@ -98,7 +98,7 @@ export default function Nav() {
           <Input
             startContent={<SearchIcon />}
             className="text-black  w-full m-auto border border-[#A46E05] rounded-[7px] bg-white cursor-pointer"
-            radius="sm"
+            radius="md"
             style={{
               paddingTop: "7px",
               paddingBottom: "7px",
@@ -110,14 +110,14 @@ export default function Nav() {
             placeholder="Search"
           />
         </NavbarItem>
-        <Button className="bg-[#A46E05BD] rounded-md px-3 py-[6px] text-white hidden sm:flex">
+        <Button className="bg-[#A46E05BD] rounded-md px-3 py-[6px] text-white hidden md:flex">
           Search
         </Button>
       </NavbarContent>
       <NavbarContent
         as="div"
         justify="end"
-        className="trigger sm:flex-grow-[0.4] flex-grow-[0.3]"
+        className="trigger md:flex-grow-[0.4] flex-grow-[0.3]"
       >
         <Dropdown
           className=""
@@ -133,7 +133,7 @@ export default function Nav() {
                 height={25}
                 alt="account"
               />
-              <span className="hidden sm:flex">Account</span>
+              <span className="hidden md:flex">Account</span>
               <Image
                 className="transition-transform mt-1"
                 src={drop}
@@ -148,7 +148,7 @@ export default function Nav() {
             variant="flat"
             className="bg-white rounded-md p-3 flex flex-col gap-[2px]"
           >
-            <DropdownItem variant="flat" className="p-0" key="sign in">
+            <DropdownItem variant="flat" className={`${user&& "nav-no-space"} p-0`} key="sign in">
               {!user && (
                 <Link href={"/auth/signIn"}>
                   <Button className="w-full text-white bg-[#A46E05BD] py-2 rounded-md">
@@ -158,7 +158,7 @@ export default function Nav() {
               )}
             </DropdownItem>
 
-            <DropdownItem variant="flat" className=" p-0 mt-1" key="sign up">
+            <DropdownItem variant="flat" className={`${user&& "nav-no-space"} my-1 p-0`} key="sign up">
               {!user && (
                 <Link href={"/auth/signup"}>
                   <Button className="w-full bg-[#A46E05BD] text-white py-2 rounded-md">
@@ -168,25 +168,29 @@ export default function Nav() {
               )}
             </DropdownItem>
 
-            <DropdownItem variant="flat" className=" py-2 mt-1 " key="account">
+            <DropdownItem variant="flat" className={`${!user&& "no-space"} py-2 `}  key="account">
+              {user&&(
               <div className="flex gap-1 justify-start items-center">
                 <Image src={account} alt="logo" width={20} height={20} />
                 <span>
                   <Link href="/account">My Account</Link>
                 </span>{" "}
               </div>
+              )}
             </DropdownItem>
-            <DropdownItem variant="flat" className=" py-2" key="settings">
+            <DropdownItem variant="flat" className={`${!user&& "no-space"} py-2`}  key="settings">
+            {user&&(
               <div className="flex gap-1 justify-start items-center">
                 <Image src={Orders} alt="logo" width={20} height={20} />
                 <span>
                   <Link href={"#"}>My Orders</Link>
                 </span>
               </div>
+              )}
             </DropdownItem>
             <DropdownItem variant="flat" className=" py-2" key="saved items">
               <div className="flex gap-2 justify-start items-center">
-                {savedItems.length > 0 ? (
+                {savedItems?.length > 0 ? (
                   <Badge
                     className="bg-[#A46E05] bg-opacity-100 text-white p-1 pt-1 z-10 mt-[5px] opacity-100"
                     color="primary"
@@ -205,10 +209,10 @@ export default function Nav() {
             </DropdownItem>
             <DropdownItem
               variant="flat"
-              className="myDropItem flex sm:hidden   py-1"
+              className="myDropItem flex md:hidden   py-1"
             >
               <div className="flex gap-2 justify-start items-center">
-                {cartItems.length > 0 ? (
+                {cartItems?.length > 0 ? (
                   <Badge
                     className="bg-[#A46E05] bg-opacity-100 text-white p-1 pt-0 z-10 mt-[2px] opacity-100"
                     color="primary"
@@ -225,27 +229,30 @@ export default function Nav() {
                 </span>
               </div>
             </DropdownItem>
+
             <DropdownItem
               onClick={() => {
                 localStorage.removeItem("user");
                 router.push("/");
               }}
               variant="flat"
-              className="text-danger"
+              className={`${!user&& "no-space"} py-2`}
               key="logout"
               color="danger"
             >
-              <div className="flex gap-1 justify-start items-center">
-                <Image src={logout} alt="logo" width={21} height={20} />
-                <span>
-                  <Link href="/account">Logout</Link>
-                </span>{" "}
-              </div>
+              {user && (
+                <div className="flex gap-1 justify-start items-center">
+                  <Image src={logout} alt="logo" width={21} height={20} />
+                  <span>
+                    <Link href="/account">Logout</Link>
+                  </span>{" "}
+                </div>
+              )}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </NavbarContent>
-      <NavbarItem className="hidden sm:flex">
+      <NavbarItem className="hidden md:flex">
         <div className="flex gap-[6px] justify-start items-center">
           {cartItems.length > 0 ? (
             <Badge
@@ -276,7 +283,7 @@ export default function Nav() {
         onOpenChange={onOpenChange}
         placement="top"
         backdrop="blur"
-        className="h-screen max-h-[unset] sm:max-h-[60vh] "
+        className="h-screen max-h-[unset] w-[95%] md:max-h-[60vh] "
         size={"3xl"}
         scrollBehavior="inside"
       >
@@ -295,34 +302,37 @@ export default function Nav() {
                 />
               </ModalHeader>
               <ModalBody>
-                <div className=" grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))]  w-full gap-x-[1.50rem] gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto ">
+                <div className=" grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))]  w-full gap-x-[1.50rem] gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto ">
+
                   {filteredList.map(
                     (
                       items: {
-                        img: string;
-                        price: string;
+                        images: any;
+                        originalPrice: string;
                         saleScale: string;
-                        title: string;
+                        name: string;
+                        _id:string
                       },
                       index: number
                     ) => (
                       <ProductCard
+                       _id={items._id}
                         item={items}
                         key={index}
-                        src={items.img}
+                        src={items.images[0].url}
                         index={index}
-                        price={items.price}
-                        saleScale={items.saleScale}
-                        title={items.title}
+                        originalPrice={items.originalPrice}
+                        title={items.name}
                         count={count}
                       />
                     )
                   )}
                 </div>
-                {filteredList.length<=0 &&<div className="flex justify-center items-center w-full">
-                  <p>No item matches your search !!</p>
-                    
-                  </div>}
+                {filteredList.length <= 0 && (
+                  <div className="flex justify-center items-center w-full">
+                    <p>No item matches your search !!</p>
+                  </div>
+                )}
               </ModalBody>
             </>
           )}

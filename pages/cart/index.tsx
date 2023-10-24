@@ -16,6 +16,9 @@ import ProductCard from "@/components/productCard";
 import Cartitem from "@/components/cartItem";
 import Sidebar from "@/components/sidebar";
 import { useRouter } from "next/router";
+
+import SkeletonLoading from "@/components/skeletonLoading";
+
 import { usePaystackPayment } from "react-paystack";
 
 export default function Cart() {
@@ -24,11 +27,11 @@ export default function Cart() {
   const { cartItems, list, count } = useContext(AppContext);
   const userDetails =
     typeof window !== "undefined" ? window.localStorage.getItem("user") : false;
-
+  const DeliveryFee = 1000;
   const user = JSON.parse(userDetails as string);
   const total = cartItems.reduce(
     (item: any, current: any) =>
-      item + parseFloat(current.price) * current.quantity,
+      item + parseFloat(current.originalPrice) * current.quantity,
     0.0
   );
   const checkout = () => {
@@ -38,7 +41,6 @@ export default function Cart() {
       onOpen();
     }
   };
-  const DeliveryFee = 1000;
 
   const publicKey = "pk_test_861fff4e3acc786df9a3e54d2889fc2633e0f888"; // Paystack test public key
   const amount = (total + DeliveryFee) * 100;
@@ -148,24 +150,24 @@ export default function Cart() {
         <div
           className={`min-h-[55vh] w-full h-full flex flex-col gap-3 bg-white p-4`}
         >
-          <h1 className="border-b border-b-black text-3xl font-semibold">
+          <h1 className="border-b border-b-black text-3xl py-2 font-semibold">
             Cart({cartItems.length})
           </h1>
           {cartItems.length > 0 ? (
             cartItems.map((items: any, index: number) => (
               <Cartitem
-                img={items.img}
+              stock={items.stock}
+                _id={items._id}
+                img={items.images[0].url}
                 index={index}
-                price={items.price}
-                saleScale={items.saleScale}
-                title={items.title}
-                seller={items.seller}
+                originalPrice={items.originalPrice}
+                title={items.name}
                 key={index}
                 quantity={items.quantity}
               />
             ))
           ) : (
-            <div className="h-[50vh] gap-2 flex justify-center items-center w-full">
+            <div className="h-[50vh] gap-2 flex justify-center items-center w-full ">
               <p>you have no items in your cart</p>
               <Image src="cart.svg" alt="logo" width={20} height={20} />
             </div>
@@ -189,7 +191,7 @@ export default function Cart() {
                 onPress={checkout}
                 className="text-white text-sm bg-[#A46E05BD] rounded-md py-2 px-4"
               >
-                Checkout (₦{total.toFixed(2)})
+                Checkout (₦{parseFloat(total.toFixed(2)).toLocaleString()})
               </Button>
             )}
           </div>
@@ -201,27 +203,34 @@ export default function Cart() {
           Most Searched Product
         </span>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))]  w-full gap-x-[1.50rem] gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto ">
-          {list.slice(1, 6).map(
-            (
-              items: {
-                img: string;
-                price: string;
-                saleScale: string;
-                title: string;
-              },
-              index: number
-            ) => (
-              <ProductCard
-                item={items}
-                key={index}
-                src={items.img}
-                index={index}
-                price={items.price}
-                saleScale={items.saleScale}
-                title={items.title}
-                count={count}
-              />
+          {list && list.length > 0 ? (
+            list.slice(1, 6).map(
+              (
+                items: {
+                  images: any;
+                  originalPrice: string;
+                  saleScale: string;
+                  name: string;
+                  _id: string;
+                  stock:string
+                },
+                index: number
+              ) => (
+                <ProductCard
+                stock={items.stock}
+                  _id={items._id}
+                  item={items}
+                  key={index}
+                  src={items.images[0].url}
+                  index={index}
+                  originalPrice={items.originalPrice}
+                  title={items.name}
+                  count={count}
+                />
+              )
             )
+          ) : (
+            <SkeletonLoading />
           )}
         </div>
       </div>
