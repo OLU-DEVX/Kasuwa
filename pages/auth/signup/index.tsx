@@ -195,7 +195,7 @@ export default function SignUpForm() {
                         className="rounded-lg f px-3 w-[80%] focus:outline-none"
                       />
 
-                      {passwordToggle.password ? (
+                      {passwordToggle ? (
                         <FaEye
                           onClick={() => handlePasswordToggle("password")}
                           className="text-gray-400 cursor-pointer"

@@ -344,41 +344,7 @@ export default function Home() {
               >
                 Buy Now!
               </Button>
-              <div className="flex gap-2 mt-2">
-                {!isPaused ? (
-                  <Button
-                    radius="sm"
-                    className="bg-[#FFA500] w-[100px] py-3 px-6 text-xs text-white"
-                    onClick={pauseCountdown}
-                  >
-                    Pause
-                  </Button>
-                ) : (
-                  <Button
-                    radius="sm"
-                    className="bg-[#4CAF50] w-[100px] py-3 px-6 text-xs text-white"
-                    onClick={resumeCountdown}
-                  >
-                    Resume
-                  </Button>
-                )}
-                <Button
-                  radius="sm"
-                  className="bg-[#9C27B0] w-[100px] py-3 px-6 text-xs text-white"
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                  Settings
-                </Button>
-                {isMainCountdownComplete && (
-                  <Button
-                    radius="sm"
-                    className="bg-[#FF6B35] w-[100px] py-3 px-6 text-xs text-white"
-                    onClick={resetCountdown}
-                  >
-                    Reset Timer
-                  </Button>
-                )}
-              </div>
+             
               {showSettings && (
                 <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-md">
                   <h3 className="font-semibold mb-3 text-gray-700">Countdown Settings</h3>
