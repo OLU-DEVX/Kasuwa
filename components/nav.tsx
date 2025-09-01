@@ -411,7 +411,7 @@ export default function Nav() {
                     <div className="grid grid-cols-4 gap-4 px-6 w-full">
                       {categoryList.map((item: any) => (
                         <div key={item.id}>
-                          <button
+                          <button 
                             className={`w-28 py-3 rounded-lg backdrop-blur-md text-black relative
                               ${
                                 selectedCategory === item.category
