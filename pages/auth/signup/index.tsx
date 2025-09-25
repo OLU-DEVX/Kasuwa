@@ -49,6 +49,7 @@ export default function SignUpForm() {
     email: "",
     password: "",
     location: "",
+    phone: "",
   });
 
   const [passwordToggle, setPasswordToggle] = useState<{
@@ -117,6 +118,10 @@ export default function SignUpForm() {
                       id="last_name"
                       name="lastName"
                       type="text"
+                      value={formData.last_name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, last_name: e.target.value })
+                      }
                       required
                       className="border border-[#ccc] rounded-lg h-12 px-3 w-full focus:outline-none focus:border-[#A46E05]"
                     />
@@ -150,6 +155,10 @@ export default function SignUpForm() {
                       id="phone"
                       name="phone"
                       type="tel"
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
                       // required
                       className="border border-[#ccc] rounded-lg h-12 px-3 w-full focus:outline-none focus:border-[#A46E05]"
                     />
@@ -170,7 +179,9 @@ export default function SignUpForm() {
                       onChange={(e) =>
                         setFormData({ ...formData, location: e.target.value })
                       }
-                      className="border border-[#ccc] rounded-lg py-16 px-3 w-full focus:outline-none focus:border-[#A46E05] min-h-[12px] h-12 "
+                      placeholder="Enter your full address"
+                      rows={3}
+                      className="border border-[#ccc] rounded-lg px-3 py-3 w-full focus:outline-none focus:border-[#A46E05] resize-none"
                     />
                   </div>
                 </div>
