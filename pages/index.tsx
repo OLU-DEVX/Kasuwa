@@ -345,39 +345,6 @@ export default function Home() {
                 Buy Now!
               </Button>
              
-              {showSettings && (
-                <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-md">
-                  <h3 className="font-semibold mb-3 text-gray-700">Countdown Settings</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">
-                        Main Countdown Duration (hours)
-                      </label>
-                      <Input
-                        type="number"
-                        defaultValue={countdownDuration.toString()}
-                        onChange={(e) => setCountdownDuration(parseInt(e.target.value) || 24)}
-                        min="1"
-                        max="168"
-                        className="w-32"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">
-                        Flash Sale Duration (hours)
-                      </label>
-                      <Input
-                        type="number"
-                        defaultValue={flashSaleDuration.toString()}
-                        onChange={(e) => setFlashSaleDuration(parseInt(e.target.value) || 6)}
-                        min="1"
-                        max="24"
-                        className="w-32"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
