@@ -1,24 +1,17 @@
-// localStorageHandler.js
+// Thin compatibility shims kept so existing imports continue to work.
+// New code should reach for `lib/storage.ts` directly.
 
-// Function to save cart items to local storage
-export const saveCartItems = (cartItems:any) => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  };
-  
-  // Function to load cart items from local storage
-  export const loadCartItems = () => {
-    const savedCartItems = typeof window !== "undefined" ? window.localStorage.getItem("cartItems"):false;
-    return savedCartItems ? JSON.parse(savedCartItems) : [];
-  };
-  
-  // Function to save saved items to local storage
-  export const saveSavedItems = (savedItems:any) => {
-    localStorage.setItem("savedItems", JSON.stringify(savedItems));
-  };
-  
-  // Function to load saved items from local storage
-  export const loadSavedItems = () => {
-    const savedItems =  typeof window !== "undefined" ? window.localStorage.getItem("savedItems"):false;
-    return savedItems ? JSON.parse(savedItems) : [];
-  };
-  
+import { readJSON, StorageKeys, writeJSON } from "@/lib/storage";
+import type { CartItem, Product } from "@/lib/types";
+
+export const saveCartItems = (cartItems: CartItem[]): void =>
+  writeJSON(StorageKeys.cart, cartItems);
+
+export const loadCartItems = (): CartItem[] =>
+  readJSON<CartItem[]>(StorageKeys.cart, []);
+
+export const saveSavedItems = (savedItems: Product[]): void =>
+  writeJSON(StorageKeys.saved, savedItems);
+
+export const loadSavedItems = (): Product[] =>
+  readJSON<Product[]>(StorageKeys.saved, []);
