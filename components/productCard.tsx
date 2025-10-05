@@ -9,6 +9,18 @@ import {
 } from "@nextui-org/react";
 import { useState, useContext } from "react";
 import { AppContext } from "@/utils/AppContext";
+import { formatNaira } from "@/lib/format";
+import { parseStock, stockColorClass, stockLabel } from "@/lib/stock";
+import type { Product } from "@/lib/types";
+
+// Card accepts the product subset its callers actually have on hand —
+// `description` and `category` aren't always present in the home/listing
+// payloads, so we keep them optional here.
+type ProductCardItem = Pick<
+  Product,
+  "_id" | "name" | "originalPrice" | "stock" | "images"
+> &
+  Partial<Pick<Product, "description" | "category" | "saleScale">>;
 
 interface card {
   _id: string;
@@ -16,7 +28,7 @@ interface card {
   index: number;
   originalPrice: string;
   title: string;
-  item: any;
+  item: ProductCardItem;
   count: number;
   stock: string;
 }
@@ -32,9 +44,9 @@ export default function ProductCard({
   _id,
   stock,
 }: card) {
-  const [localCount, setLocalCount] = useState(count);
+  const { amount, status } = parseStock(stock);
+  const [localCount, setLocalCount] = useState(Math.min(count, Math.max(amount, 1)));
   const { addToCart } = useContext(AppContext);
-  const amount = parseFloat(stock);
   const increament = () => {
     if (localCount < amount) {
       setLocalCount(localCount + 1);
@@ -47,13 +59,7 @@ export default function ProductCard({
   };
 
   function getStockStatus() {
-    if (amount === 0) {
-      return <p className="text-red-500">Out of stock</p>;
-    } else if (amount < 20) {
-      return <p className="text-yellow-500">Low on stock</p>;
-    } else {
-      return <p className="text-stone-600">In stock</p>;
-    }
+    return <p className={stockColorClass(status)}>{stockLabel(status)}</p>;
   }
   return (
     <Card
@@ -119,7 +125,7 @@ export default function ProductCard({
             <div className="flex justify-between">
               <p>Price:</p>
               <p className="text-default-500">
-                ₦{parseFloat(originalPrice).toLocaleString()}
+                {formatNaira(originalPrice)}
               </p>
             </div>
           </div>
