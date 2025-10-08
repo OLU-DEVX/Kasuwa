@@ -3,6 +3,8 @@ import { useState, useContext, useEffect } from "react";
 import { AppContext } from "@/utils/AppContext";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import Link from "next/link";
+import { formatNaira } from "@/lib/format";
+import { parseStock, stockColorClass, stockLabel } from "@/lib/stock";
 interface cartItem {
   img: string;
   index: number;
@@ -25,16 +27,10 @@ export default function Cartitem({
   const [count, setCount] = useState(quantity);
   const { removeFromCart, increaseQuantity, decreaseQuantity } =
     useContext(AppContext);
-  const amount = parseFloat(stock);
+  const { amount, status } = parseStock(stock);
 
   function getStockStatus() {
-    if (amount === 0) {
-      return <p className="text-red-500">Out of stock</p>;
-    } else if (amount < 20) {
-      return <p className="text-yellow-500">Low on stock</p>;
-    } else {
-      return <p className="text-stone-600">In stock</p>;
-    }
+    return <p className={stockColorClass(status)}>{stockLabel(status)}</p>;
   }
 
   useEffect(() => {
@@ -83,7 +79,7 @@ export default function Cartitem({
         </div>
 
         <div className="flex flex-col gap-3">
-          <p className="text-center">₦{originalPrice.toLocaleString()}</p>
+          <p className="text-center">{formatNaira(originalPrice)}</p>
           {amount === 0 && (
             <div className="flex justify-between px-1 gap-1 text-white items-center">
               <Button
