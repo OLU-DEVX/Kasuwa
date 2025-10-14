@@ -11,102 +11,74 @@ import { AppContext } from "@/utils/AppContext";
 import Head from "next/head";
 import Notification from "@/components/notification";
 import "../app/globals.css";
+import { apiFetch } from "@/lib/api";
+import {
+  readJSON,
+  StorageKeys,
+  writeJSON,
+} from "@/lib/storage";
+import { NOTIFICATION_TIMEOUT_MS } from "@/lib/constants";
+import type { CartItem, Product } from "@/lib/types";
 
 function App({ Component, pageProps }: AppProps) {
-  const [cartItems, setCartItems] = useState<any>([]);
-  const [savedItems, setSavedItems] = useState<any>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [savedItems, setSavedItems] = useState<Product[]>([]);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [count, setCount] = useState(1);
   const [notification, setNotification] = useState("");
   const [notificationAction, setNotificationAction] = useState("");
   const [notificationVisibles, setNotificationVisible] = useState(false);
-  const [list, setList] = useState([]);
-  const API_URL = "https://kasuwa-b671.onrender.com";
-  // Function to save cart items to local storage
-  const saveCartItems = (cartItems: any) => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  };
+  const [list, setList] = useState<Product[]>([]);
 
-  // Function to load cart items from local storage
-  const loadCartItems = () => {
-    const savedCartItems =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("cartItems")
-        : false;
-    return savedCartItems ? JSON.parse(savedCartItems) : [];
-  };
-
-  // Function to save saved items to local storage
-  const saveSavedItems = (savedItems: any) => {
-    localStorage.setItem("savedItems", JSON.stringify(savedItems));
-  };
-
-  // Function to load saved items from local storage
-  const loadSavedItems = () => {
-    const savedItems =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("savedItems")
-        : false;
-    return savedItems ? JSON.parse(savedItems) : [];
-  };
   const FetchProducts = async () => {
     try {
-      const allProduct = await fetch(`${API_URL}/products`);
-      const allProductRes = await allProduct.json();
-      setList(allProductRes);
-    } catch (error) {
-      // Error handled silently
+      const products = await apiFetch<Product[]>("/products");
+      setList(products);
+    } catch {
+      // Surface this in a future toast — for now leave the skeleton state.
     }
   };
   useEffect(() => {
     FetchProducts();
   }, []);
-  const showNotification = (message: any) => {
+  const showNotification = (message: string) => {
     setNotification(message);
     setNotificationVisible(true);
     setTimeout(() => {
       setNotification("");
       setNotificationVisible(false);
-    }, 3000); // Hide the notification after 3 seconds (adjust the duration as needed)
+    }, NOTIFICATION_TIMEOUT_MS);
   };
 
   useEffect(() => {
     // Load cart items and saved items from local storage on component mount
-    const loadedCartItems = loadCartItems();
-    const loadedSavedItems = loadSavedItems();
-
-    // Set the loaded items in state using the functional form of the state-setting functions
-    setCartItems((prevCartItems: any) => [
-      ...prevCartItems,
-      ...loadedCartItems,
-    ]);
-    setSavedItems((prevSavedItems: any) => [
-      ...prevSavedItems,
-      ...loadedSavedItems,
+    setCartItems((prev) => [...prev, ...readJSON<CartItem[]>(StorageKeys.cart, [])]);
+    setSavedItems((prev) => [
+      ...prev,
+      ...readJSON<Product[]>(StorageKeys.saved, []),
     ]);
   }, []);
 
   useEffect(() => {
-    // Save cart items and saved items to local storage whenever they change
-    saveCartItems(cartItems);
-    saveSavedItems(savedItems);
+    writeJSON(StorageKeys.cart, cartItems);
+    writeJSON(StorageKeys.saved, savedItems);
   }, [cartItems, savedItems]);
 
-  const addToCart = (product: any, count: number) => {
-    const itemWithCount = { ...product, quantity: count };
+  const addToCart = (product: Product, quantity: number) => {
+    const itemWithCount: CartItem = { ...product, quantity };
     setCartItems([...cartItems, itemWithCount]);
     showNotification(product.name);
     setNotificationAction("added to cart");
   };
-  const addToSavedItems = (product: any) => {
+  const addToSavedItems = (product: Product) => {
     setSavedItems([...savedItems, product]);
-    showNotification(product.title);
+    showNotification(product.name);
     setNotificationAction("added to saved items");
   };
 
-  const removeFromSavedItems = (title: string, item: any) => {
+  const removeFromSavedItems = (title: string, item: Product) => {
     const updatedSavedItems = savedItems.filter(
-      (savedItem: any) => savedItem !== item
+      (savedItem) => savedItem !== item
     );
     setSavedItems(updatedSavedItems);
     showNotification(title);
@@ -115,7 +87,7 @@ function App({ Component, pageProps }: AppProps) {
 
   const removeFromCart = (title: string, cartItemIndex: number) => {
     const updatedCart = cartItems.filter(
-      (_cartItem: any, index: number) => index !== cartItemIndex
+      (_cartItem, index: number) => index !== cartItemIndex
     );
     setCartItems(updatedCart);
     showNotification(title);
@@ -123,16 +95,16 @@ function App({ Component, pageProps }: AppProps) {
   };
 
   const increaseQuantity = (index: number) => {
-    // Create a new array with the updated quantity for the specific item
-    const updatedCartItems = cartItems.map((item: any, i: any) =>
+    const updatedCartItems = cartItems.map((item, i) =>
       i === index ? { ...item, quantity: item.quantity + 1 } : item
     );
     setCartItems(updatedCartItems);
   };
   const decreaseQuantity = (index: number) => {
-    // Create a new array with the updated quantity for the specific item
-    const updatedCartItems = cartItems.map((item: any, i: any) =>
-      i === index ? { ...item, quantity: item.quantity - 1 } : item
+    const updatedCartItems = cartItems.map((item, i) =>
+      i === index
+        ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+        : item
     );
     setCartItems(updatedCartItems);
   };
