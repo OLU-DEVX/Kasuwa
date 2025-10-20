@@ -28,11 +28,13 @@ import Account from "../public/acount-2.svg";
 import drop from "../public/drop.svg";
 import savedIcon from "../public/saved.svg";
 import Orders from "../public/orders.svg";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { AppContext } from "@/utils/AppContext";
 import { useRouter } from "next/router";
 import logout from "../public/logout copy.svg";
 import ProductCard from "./productCard";
+import { useDebounce } from "@/lib/useDebounce";
+import { CATEGORIES } from "@/lib/constants";
 
 export default function Nav() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -46,11 +48,19 @@ export default function Nav() {
   const farmerDetails = typeof window !== "undefined" ? window.localStorage.getItem("farmer") : false;
   const farmer = JSON.parse(farmerDetails as string);
 
-  const filteredList = list.filter((item: any) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory ? item.category === selectedCategory : true;
-    return matchesCategory && matchesSearch;
-  });
+  // Debounce the typed query so we don't re-filter the entire catalogue
+  // on every keystroke when the list is large.
+  const debouncedQuery = useDebounce(searchQuery, 200);
+  const filteredList = useMemo(() => {
+    const needle = debouncedQuery.toLowerCase();
+    return list.filter((item: any) => {
+      const matchesSearch = item.name.toLowerCase().includes(needle);
+      const matchesCategory = selectedCategory
+        ? item.category === selectedCategory
+        : true;
+      return matchesCategory && matchesSearch;
+    });
+  }, [list, debouncedQuery, selectedCategory]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category === selectedCategory ? null : category);
@@ -61,14 +71,15 @@ export default function Nav() {
     setSearchQuery(event.target.value);
   };
 
-  const categoryList = [
-    { id: 1, name: "Fruits", category: "Fruits" },
-    { id: 2, name: "Dairy", category: "Dairy" },
-    { id: 3, name: "Vegetables", category: "Vegetables" },
-    { id: 4, name: "Grains", category: "Grains" },
-    { id: 5, name: "Tubers", category: "Tubers" },
-    { id: 6, name: "Fertilizers", category: "Fertilizers" },
-  ];
+  const categoryList = useMemo(
+    () =>
+      (
+        ["Fruits", "Dairy", "Vegetables", "Grains", "Tubers", "Fertilizers"] as const
+      )
+        .filter((c) => (CATEGORIES as readonly string[]).includes(c))
+        .map((name, idx) => ({ id: idx + 1, name, category: name })),
+    []
+  );
 
   const handleDropdownClick = () => {
     if (!user) {
