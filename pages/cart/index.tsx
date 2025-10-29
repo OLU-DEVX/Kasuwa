@@ -1,5 +1,5 @@
-"use client"
-import { useContext } from "react";
+"use client";
+import { useContext, useMemo, useState } from "react";
 import { AppContext } from "@/utils/AppContext";
 import {
   Image,
@@ -19,20 +19,40 @@ import { useRouter } from "next/router";
 import SkeletonLoading from "@/components/skeletonLoading";
 
 import { usePaystackPayment } from "react-paystack";
+import { formatNaira } from "@/lib/format";
+import { calculateTotals } from "@/lib/pricing";
+import { resolveDiscount } from "@/lib/discount";
+import { PAYSTACK_PUBLIC_KEY } from "@/lib/constants";
+import { readJSON, StorageKeys } from "@/lib/storage";
+import type { CartItem, User } from "@/lib/types";
 
 export default function Cart() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const { cartItems, list, count } = useContext(AppContext);
-  const userDetails =
-    typeof window !== "undefined" ? window.localStorage.getItem("user") : false;
-  const DeliveryFee = 1000;
-  const user = JSON.parse(userDetails as string);
-  const total = cartItems.reduce(
-    (item: any, current: any) =>
-      item + parseFloat(current.originalPrice) * current.quantity,
-    0.0
+  const user = readJSON<User | null>(StorageKeys.user, null);
+
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+
+  const totals = useMemo(
+    () =>
+      calculateTotals(cartItems as CartItem[], { discount: discountAmount }),
+    [cartItems, discountAmount]
   );
+
+  const applyDiscount = () => {
+    const result = resolveDiscount(discountCode, totals.subtotal);
+    if (!result.ok) {
+      setDiscountError(result.message);
+      setDiscountAmount(0);
+      return;
+    }
+    setDiscountError(null);
+    setDiscountAmount(result.amount);
+  };
+
   const checkout = () => {
     if (!user) {
       router.push("/auth/signIn");
@@ -41,9 +61,7 @@ export default function Cart() {
     }
   };
 
-  const publicKey = "pk_test_861fff4e3acc786df9a3e54d2889fc2633e0f888"; // Paystack test public key
-  const amount = (total + DeliveryFee) * 100;
-  const reference = `order_${Math.floor(Math.random() * 1000000) + 1}`; // Generate a unique reference for each transaction
+  const reference = `order_${Math.floor(Math.random() * 1000000) + 1}`;
 
   const onSuccess = () => {
     // Payment successful
@@ -51,16 +69,15 @@ export default function Cart() {
 
   const config = {
     reference,
-    email: user?.email,
-    amount,
-    publicKey,
+    email: user?.email ?? "",
+    amount: totals.total * 100,
+    publicKey: PAYSTACK_PUBLIC_KEY,
     onSuccess,
   };
 
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    // Trigger the Paystack payment process
     initializePayment();
   };
 
@@ -78,22 +95,30 @@ export default function Cart() {
               <ModalBody>
                 <div className=" border-b border-b-gray-400 pb-1">
                   <div className="flex justify-between">
-                    <p>Item's total({cartItems.length})</p>
+                    <p>Item&apos;s total({totals.itemCount})</p>
                     <span className="font-semibold">
-                      ₦{total.toLocaleString("en-US")}
+                      {formatNaira(totals.subtotal)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <p>Delivery fees</p>
                     <span className="font-semibold">
-                      ₦{DeliveryFee.toLocaleString("en-US")}
+                      {formatNaira(totals.deliveryFee)}
                     </span>
                   </div>
+                  {totals.discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <p>Discount</p>
+                      <span className="font-semibold">
+                        -{formatNaira(totals.discount)}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex justify-between  border-b border-b-gray-400 pb-1">
                   <p>Total</p>
                   <span className="font-semibold">
-                    ₦{(total + DeliveryFee).toLocaleString("en-US")}
+                    {formatNaira(totals.total)}
                   </span>
                 </div>
                 <div className="flex gap-[3px]">
@@ -101,11 +126,24 @@ export default function Cart() {
                     placeholder="Enter discount code here"
                     className="border text-black border-gray-400 rounded-md"
                     radius="sm"
+                    value={discountCode}
+                    onValueChange={(value) => {
+                      setDiscountCode(value);
+                      setDiscountError(null);
+                    }}
                   />
-                  <Button className="text-white bg-[#A46E05] rounded-md">
+                  <Button
+                    className="text-white bg-[#A46E05] rounded-md"
+                    onPress={applyDiscount}
+                  >
                     Apply{" "}
                   </Button>
                 </div>
+                {discountError && (
+                  <p className="text-sm text-red-500" role="alert">
+                    {discountError}
+                  </p>
+                )}
                 <div className="border border-gray-400 rounded-md">
                   <div className="flex justify-between p-2 border-b border-gray-400">
                     <p>we support</p>
@@ -150,7 +188,7 @@ export default function Cart() {
           className={`min-h-[55vh] w-full h-full flex flex-col gap-3 bg-white p-4`}
         >
           <h1 className="border-b border-b-black text-3xl py-2 font-semibold">
-            Cart({cartItems.length})
+            Cart({totals.itemCount})
           </h1>
           {cartItems.length > 0 ? (
             cartItems.map((items: any, index: number) => (
@@ -183,14 +221,14 @@ export default function Cart() {
                 <span className="font-bold text-md">Subtotal</span>
                 <p className="text-stone-600">Delivery not included yet</p>
               </div>
-              <span>₦{parseFloat(total.toFixed(2)).toLocaleString()}</span>
+              <span>{formatNaira(totals.subtotal)}</span>
             </div>
             {cartItems.length > 0 && (
               <Button
                 onPress={checkout}
                 className="text-white text-sm bg-[#A46E05BD] rounded-md py-2 px-4"
               >
-                Checkout (₦{parseFloat(total.toFixed(2)).toLocaleString()})
+                Checkout ({formatNaira(totals.subtotal)})
               </Button>
             )}
           </div>
