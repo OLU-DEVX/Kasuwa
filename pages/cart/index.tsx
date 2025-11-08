@@ -17,6 +17,7 @@ import Cartitem from "@/components/cartItem";
 import { useRouter } from "next/router";
 
 import SkeletonLoading from "@/components/skeletonLoading";
+import EmptyState from "@/components/EmptyState";
 
 import { usePaystackPayment } from "react-paystack";
 import { formatNaira } from "@/lib/format";
@@ -204,10 +205,13 @@ export default function Cart() {
               />
             ))
           ) : (
-            <div className="h-[50vh] gap-2 flex justify-center items-center w-full ">
-              <p>you have no items in your cart</p>
-              <Image src="cart.svg" alt="logo" width={20} height={20} />
-            </div>
+            <EmptyState
+              title="Your cart is empty"
+              message="Browse the marketplace to find fresh produce, dairy, and farm essentials."
+              actionLabel="Continue shopping"
+              actionHref="/"
+              icon={<Image src="cart.svg" alt="" width={32} height={32} />}
+            />
           )}
         </div>
 
