@@ -12,140 +12,37 @@ import Image from "next/image";
 import {
   Button,
 } from "@nextui-org/react";
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { AppContext } from "@/utils/AppContext";
 import ProductCard from "@/components/productCard";
 import Flash from "../public/flash.svg";
 import SkeletonLoading from "@/components/skeletonLoading";
+import { useCountdown } from "@/lib/useCountdown";
+import { StorageKeys } from "@/lib/storage";
+import { pad2 } from "@/lib/format";
+
+const MAIN_COUNTDOWN_MS = 24 * 60 * 60 * 1000;
+const FLASH_SALE_MS = 6 * 60 * 60 * 1000;
 
 export default function Home() {
   const { list, count } = useContext(AppContext);
-  
-  // Countdown state
-  const [countdown, setCountdown] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+
+  const countdown = useCountdown({
+    durationMs: MAIN_COUNTDOWN_MS,
+    storageKey: StorageKeys.mainCountdownEnd,
+  });
+  const flashSaleCountdown = useCountdown({
+    durationMs: FLASH_SALE_MS,
+    storageKey: StorageKeys.flashSaleEnd,
   });
 
-  // Flash sale countdown state
-  const [flashSaleCountdown, setFlashSaleCountdown] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
-
-  // Check if countdown is urgent (less than 10 minutes)
-  const isCountdownUrgent = countdown.hours === 0 && countdown.minutes < 10;
-  const isFlashSaleUrgent = flashSaleCountdown.hours === 0 && flashSaleCountdown.minutes < 10;
-
-  // Countdown completion states
-  const [isMainCountdownComplete, setIsMainCountdownComplete] = useState(false);
-
-  // Play countdown sound effect
-  const playCountdownSound = () => {
-    if (typeof window !== 'undefined' && 'AudioContext' in window) {
-      const audioContext = new (window as any).AudioContext();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.1);
-    }
-  };
-
-  // Save countdown end times to localStorage
-  const saveCountdownTimes = (mainEndTime: Date, flashEndTime: Date) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('mainCountdownEnd', mainEndTime.getTime().toString());
-      localStorage.setItem('flashSaleEnd', flashEndTime.getTime().toString());
-    }
-  };
-
-  // Load countdown end times from localStorage
-  const loadCountdownTimes = () => {
-    if (typeof window !== 'undefined') {
-      const mainEnd = localStorage.getItem('mainCountdownEnd');
-      const flashEnd = localStorage.getItem('flashSaleEnd');
-      
-      if (mainEnd && flashEnd) {
-        return {
-          mainEndTime: new Date(parseInt(mainEnd)),
-          flashEndTime: new Date(parseInt(flashEnd))
-        };
-      }
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    // Try to load existing countdown times from localStorage
-    const savedTimes = loadCountdownTimes();
-    
-    // Set end time for main countdown (24 hours from now)
-    let endTime = new Date();
-    endTime.setHours(endTime.getHours() + 24);
-
-    // Set end time for flash sale (6 hours from now)
-    let flashSaleEndTime = new Date();
-    flashSaleEndTime.setHours(flashSaleEndTime.getHours() + 6);
-
-    // Use saved times if they exist and are in the future
-    if (savedTimes) {
-      const now = new Date().getTime();
-      if (savedTimes.mainEndTime.getTime() > now) {
-        endTime = savedTimes.mainEndTime;
-      }
-      if (savedTimes.flashEndTime.getTime() > now) {
-        flashSaleEndTime = savedTimes.flashEndTime;
-      }
-    }
-
-    // Save the current end times
-    saveCountdownTimes(endTime, flashSaleEndTime);
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      
-      // Main countdown
-      const mainDistance = endTime.getTime() - now;
-      if (mainDistance > 0) {
-        setCountdown({
-          days: Math.floor(mainDistance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((mainDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((mainDistance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((mainDistance % (1000 * 60)) / 1000)
-        });
-        setIsMainCountdownComplete(false);
-        
-        // Play sound when countdown becomes urgent
-        if (mainDistance <= 600000 && mainDistance > 599000) { // Last 10 minutes
-          playCountdownSound();
-        }
-      } else {
-        setIsMainCountdownComplete(true);
-      }
-
-      // Flash sale countdown
-      const flashDistance = flashSaleEndTime.getTime() - now;
-      if (flashDistance > 0) {
-        setFlashSaleCountdown({
-          hours: Math.floor(flashDistance / (1000 * 60 * 60)),
-          minutes: Math.floor((flashDistance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((flashDistance % (1000 * 60)) / 1000)
-        });
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
+  const isCountdownUrgent =
+    countdown.hours === 0 && countdown.minutes < 10 && !countdown.isComplete;
+  const isFlashSaleUrgent =
+    flashSaleCountdown.hours === 0 &&
+    flashSaleCountdown.minutes < 10 &&
+    !flashSaleCountdown.isComplete;
+  const isMainCountdownComplete = countdown.isComplete;
 
   return (
     <div className="mx-auto flex flex-col w-full">
@@ -354,15 +251,15 @@ export default function Home() {
               <span className="text-sm font-medium">Time Left:</span>
               <div className={`flex gap-1 px-3 py-1 rounded-lg ${isFlashSaleUrgent ? 'bg-red-500 animate-pulse' : 'bg-[#38B419]'}`}>
                 <span suppressHydrationWarning className="font-bold text-white">
-                  {flashSaleCountdown.hours.toString().padStart(2, '0')}
+                  {pad2(flashSaleCountdown.hours)}
                 </span>
                 <span className="text-white">:</span>
                 <span suppressHydrationWarning className="font-bold text-white">
-                  {flashSaleCountdown.minutes.toString().padStart(2, '0')}
+                  {pad2(flashSaleCountdown.minutes)}
                 </span>
                 <span className="text-white">:</span>
                 <span suppressHydrationWarning className="font-bold text-white">
-                  {flashSaleCountdown.seconds.toString().padStart(2, '0')}
+                  {pad2(flashSaleCountdown.seconds)}
                 </span>
               </div>
             </p>
