@@ -9,7 +9,7 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error?: Error;
+  error?: Error | undefined;
 }
 
 class ErrorBoundary extends Component<Props, State> {
