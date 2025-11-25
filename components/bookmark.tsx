@@ -9,30 +9,41 @@ export default function Bookmark({ title, item }: any) {
     useContext(AppContext);
 
   const isFavourite = savedItems.includes(item);
+  const label = isFavourite
+    ? `Remove ${title} from saved items`
+    : `Save ${title} for later`;
+  const onToggle = (event: React.KeyboardEvent | React.MouseEvent) => {
+    if (
+      "key" in event &&
+      event.key !== "Enter" &&
+      event.key !== " " &&
+      event.type === "keydown"
+    ) {
+      return;
+    }
+    if (isFavourite) {
+      removeFromSavedItems(title, item);
+    } else {
+      addToSavedItems(item);
+    }
+  };
 
   return (
-    <div className="ml-auto">
-      {isFavourite ? (
-        <Image
-          src={isBookmarked}
-          width={30}
-          height={30}
-          alt="bookmark"
-          onClick={() => {
-            removeFromSavedItems(title, item); // Pass the item to remove
-          }}
-        />
-      ) : (
-        <Image
-          src={bookmark}
-          width={30}
-          height={30}
-          alt="bookmark"
-          onClick={() => {
-            addToSavedItems(item); // Pass the item to add
-          }}
-        />
-      )}
+    <div
+      className="ml-auto cursor-pointer"
+      role="button"
+      tabIndex={0}
+      aria-pressed={isFavourite}
+      aria-label={label}
+      onClick={onToggle}
+      onKeyDown={onToggle}
+    >
+      <Image
+        src={isFavourite ? isBookmarked : bookmark}
+        width={30}
+        height={30}
+        alt=""
+      />
     </div>
   );
 }
