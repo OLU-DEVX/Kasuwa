@@ -106,14 +106,16 @@ export default function ProductCard({
               <div className="flex justify-center gap-1 items-center">
                 <Button
                   radius="none"
+                  aria-label={`Decrease quantity of ${title}`}
                   className=" h-[25px] min-w-[25px]  p-1"
                   onClick={decreament}
                 >
                   -
                 </Button>
-                <span>{localCount}</span>
+                <span aria-live="polite">{localCount}</span>
                 <Button
                   radius="none"
+                  aria-label={`Increase quantity of ${title}`}
                   className="w-[25px] h-[25px] min-w-[25px] p-1"
                   onClick={increament}
                 >
@@ -132,12 +134,13 @@ export default function ProductCard({
           {amount > 0 && (
             <Button
               radius="none"
+              aria-label={`Add ${localCount} × ${title} to cart`}
               className="flex gap-2 w-full bg-[#38B419] text-white py-2"
               onClick={() => {
                 addToCart(item, localCount);
               }}
             >
-              <Image src="cart copy.svg" alt="cart" />
+              <Image src="cart copy.svg" alt="" />
               <span>Add to cart</span>
             </Button>
           )}
@@ -145,12 +148,13 @@ export default function ProductCard({
             <Button
               isDisabled
               radius="none"
+              aria-label={`Add ${localCount} × ${title} to cart`}
               className="flex gap-2 w-full bg-[#38B419] text-white py-2"
               onClick={() => {
                 addToCart(item, localCount);
               }}
             >
-              <Image src="cart copy.svg" alt="cart" />
+              <Image src="cart copy.svg" alt="" />
               <span>Add to cart</span>
             </Button>
           )}
