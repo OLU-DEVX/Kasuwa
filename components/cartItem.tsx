@@ -80,65 +80,42 @@ export default function Cartitem({
 
         <div className="flex flex-col gap-3">
           <p className="text-center">{formatNaira(originalPrice)}</p>
-          {amount === 0 && (
-            <div className="flex justify-between px-1 gap-1 text-white items-center">
-              <Button
-                isDisabled
-                radius="none"
-                className="w-[25px] h-[25px] min-w-[25px] p-1 bg-[#A46E0580]"
-                onClick={() => {
-                  if(count>1){
+          <div className="flex justify-between px-1 gap-1 text-white items-center">
+            <Button
+              isDisabled={amount === 0 || count <= 1}
+              radius="none"
+              aria-label={`Decrease quantity of ${title}`}
+              className="w-[25px] h-[25px] min-w-[25px] p-1 bg-[#A46E0580]"
+              onClick={() => {
+                if (count > 1) {
                   decreaseCountQuantity();
                   decreament();
-                  }
-                }}
-              >
-                -
-              </Button>
-              <span className="text-black">{count}</span>
-              <Button
-                isDisabled
-                radius="none"
-                className="w-[25px] h-[25px] min-w-[25px] p-1 bg-[#A46E05]"
-                onClick={() => {
+                }
+              }}
+            >
+              -
+            </Button>
+            <span aria-live="polite" className="text-black">
+              {count}
+            </span>
+            <Button
+              isDisabled={amount === 0 || count >= amount}
+              radius="none"
+              aria-label={`Increase quantity of ${title}`}
+              className="w-[25px] h-[25px] min-w-[25px] p-1 bg-[#A46E05]"
+              onClick={() => {
+                if (count < amount) {
                   increaseCountQuantity();
                   increament();
-                }}
-              >
-                +
-              </Button>
-            </div>
-          )}
-
-          {amount > 0 && (
-            <div className="flex justify-between px-1 gap-1 text-white items-center">
-              <Button
-                radius="none"
-                className="w-[25px] h-[25px] min-w-[25px] p-1 bg-[#A46E0580]"
-                onClick={() => {
-                  if(count>1){
-                  decreaseCountQuantity();
-                  decreament();
-                  }
-                }}
-              >
-                -
-              </Button>
-              <span className="text-black">{count}</span>
-              <Button
-                radius="none"
-                className="w-[25px] h-[25px] min-w-[25px] p-1 bg-[#A46E05]"
-                onClick={() => {
-                  increaseCountQuantity();
-                  increament();
-                }}
-              >
-                +
-              </Button>
-            </div>
-          )}
+                }
+              }}
+            >
+              +
+            </Button>
+          </div>
           <Button
             startContent={<MdOutlineDeleteForever size={25} />}
+            aria-label={`Remove ${title} from cart`}
             onClick={() => {
               deleteFromCart(title, index);
             }}
