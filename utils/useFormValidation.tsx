@@ -1,4 +1,10 @@
 import { useState, useCallback } from "react";
+import {
+  isValidEmail,
+  isValidName,
+  isValidPhone,
+  validatePassword,
+} from "@/lib/validate";
 
 interface ValidationRule {
   required?: boolean;
@@ -6,11 +12,20 @@ interface ValidationRule {
   maxLength?: number;
   pattern?: RegExp;
   custom?: (value: string) => boolean;
+  /** Pick a built-in validator instead of writing one inline. */
+  preset?: "email" | "phone" | "name" | "password";
 }
 
 interface ValidationErrors {
   [key: string]: string;
 }
+
+const PRESETS = {
+  email: (value: string) => isValidEmail(value),
+  phone: (value: string) => isValidPhone(value),
+  name: (value: string) => isValidName(value),
+  password: (value: string) => validatePassword(value).ok,
+} as const;
 
 export const useFormValidation = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -33,6 +48,10 @@ export const useFormValidation = () => {
         return `${name} format is invalid`;
       }
 
+      if (rules.preset && !PRESETS[rules.preset](value)) {
+        return `${name} format is invalid`;
+      }
+
       if (rules.custom && !rules.custom(value)) {
         return `${name} is invalid`;
       }
@@ -43,11 +62,16 @@ export const useFormValidation = () => {
   );
 
   const validateForm = useCallback(
-    (formData: Record<string, string>, validationRules: Record<string, ValidationRule>) => {
+    (
+      formData: Record<string, string>,
+      validationRules: Record<string, ValidationRule>
+    ) => {
       const newErrors: ValidationErrors = {};
 
       Object.keys(validationRules).forEach((field) => {
-        const error = validateField(field, formData[field] || "", validationRules[field]);
+        const rule = validationRules[field];
+        if (!rule) return;
+        const error = validateField(field, formData[field] || "", rule);
         if (error) {
           newErrors[field] = error;
         }
