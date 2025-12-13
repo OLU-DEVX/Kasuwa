@@ -1,0 +1,10 @@
+# Default reviewers for every change in the repository.
+*       @OLU-DEVX
+
+# Docs changes can be reviewed independently.
+*.md    @OLU-DEVX
+
+# CI / build configuration deserves an extra pair of eyes.
+.github/        @OLU-DEVX
+next.config.mjs @OLU-DEVX
+tsconfig.json   @OLU-DEVX
