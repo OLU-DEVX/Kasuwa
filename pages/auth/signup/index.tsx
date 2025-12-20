@@ -6,25 +6,51 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { API_URL, ROUTES } from "@/lib/constants";
+import {
+  validateEmail,
+  validatePassword,
+  validatePhone,
+} from "@/lib/validate";
 
-const API_BASE_URL = "https://kasuwa-b671.onrender.com/";
+type SignUpStatus = "idle" | "loading" | "failed" | "network_error";
 
 export default function SignUpForm() {
-  const [loading, setLoading] = useState("idle");
+  const [loading, setLoading] = useState<SignUpStatus>("idle");
+  const [fieldError, setFieldError] = useState<string | null>(null);
   const router = useRouter();
   const handleSignUp = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setFieldError(null);
+
+    const emailResult = validateEmail(formData.email);
+    if (!emailResult.ok) {
+      setFieldError(emailResult.reason);
+      return;
+    }
+    const passwordResult = validatePassword(formData.password);
+    if (!passwordResult.ok) {
+      setFieldError(passwordResult.reason);
+      return;
+    }
+    if (formData.phone) {
+      const phoneResult = validatePhone(formData.phone);
+      if (!phoneResult.ok) {
+        setFieldError(phoneResult.reason);
+        return;
+      }
+    }
+
     setLoading("loading");
     try {
-      await axios.post(
-        `${API_BASE_URL}users/register`,
-        formData
-      );
-      // Signup successful
-      router.push("/");
+      await axios.post(`${API_URL}/users/register`, formData);
+      router.push(ROUTES.home);
     } catch (error) {
-      // Handle signup error
-      setLoading("failed");
+      if (axios.isAxiosError(error) && !error.response) {
+        setLoading("network_error");
+      } else {
+        setLoading("failed");
+      }
     }
   };
   const renderLoadingUI = () => {
@@ -37,6 +63,8 @@ export default function SignUpForm() {
           Signing up...
         </div>
       );
+    } else if (loading === "network_error") {
+      return <div>Network error. Check your connection and try again.</div>;
     } else if (loading === "failed") {
       return <div>Signup failed. Please try again.</div>;
     }
@@ -259,8 +287,14 @@ export default function SignUpForm() {
 
               <Spacer y={2} />
 
+              {fieldError && (
+                <p className="text-sm text-red-500" role="alert">
+                  {fieldError}
+                </p>
+              )}
+
               <div className="text-end">
-                <Link href={"#"} className="text-[#38B419]">
+                <Link href={ROUTES.forgotPassword} className="text-[#38B419]">
                   Forgot password?
                 </Link>
               </div>
