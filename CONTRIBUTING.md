@@ -1,92 +1,82 @@
-# Contributing
+# Contributing to Kasuwa
 
-When contributing to this repository, please first discuss the change you wish to make via [issue](https://github.com/ShedrachJonah11/Kasuwa/issues),
-[email](mailto:kasuwa@gmail.com), or any other method with the owners of this repository before making a change. 
+Welcome! Kasuwa is an open-source marketplace and we love community
+contributions. This guide explains how to get a change merged with minimum
+back-and-forth.
 
-Please note we have a [Code of Conduct](https://github.com/ShedrachJonah11/Kasuwa/blob/main/CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
+## Before you start
 
-## Pull Request Process
+1. **Read the architecture overview** in `ARCHITECTURE.md` so you know which
+   layer your change belongs in.
+2. **Check existing issues** before opening a new one — duplicates are
+   common for popular features.
+3. **Open an issue first** for non-trivial work so we can agree on the
+   approach before you spend time on it.
 
-1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
-   build.
-2. Update the README.md with details of changes to the interface, this includes new environment 
-   variables, exposed ports, useful file locations and container parameters.
-3. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
-4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
-   do not have permission to do that, you may request the second reviewer to merge it for you.
+Please note we have a
+[Code of Conduct](./CODE_OF_CONDUCT.md), please follow it in all
+your interactions with the project.
 
-## Code of Conduct
+## Local setup
 
-### Our Pledge
+```bash
+nvm use            # picks up Node 20.x from .nvmrc
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
-In the interest of fostering an open and welcoming environment, we as
-contributors and maintainers pledge to making participation in our project and
-our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, gender identity and expression, level of experience,
-nationality, personal appearance, race, religion, or sexual identity and
-orientation.
+Visit http://localhost:3000 and you should see the marketplace home page.
 
-### Our Standards
+## Branch + commit conventions
 
-Examples of behavior that contributes to creating a positive environment
-include:
+- Branch off `main`. Use kebab-case branch names: `feat/cart-discount-codes`.
+- Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/).
+  Common prefixes:
 
-* Using welcoming and inclusive language
-* Being respectful of viewpoints, implementation pattern and ideas that differ from yours
-* Giving and accepting constructive criticism with an open mind
-* Focusing on what is best for the community
-* Showing empathy towards other community members
-* Being teachable and possessing good communication and problem solving skills
+  | Prefix      | When to use                                          |
+  |-------------|------------------------------------------------------|
+  | `feat:`     | A user-visible feature or new helper                 |
+  | `fix:`      | A bug fix                                            |
+  | `refactor:` | Internal restructure without behaviour change        |
+  | `perf:`     | Performance work                                     |
+  | `docs:`     | README / inline / API docs                           |
+  | `test:`     | Adding or fixing tests / type assertions             |
+  | `chore:`    | Tooling, config, deps                                |
+  | `style:`    | Formatting, whitespace, no logic                     |
 
-Examples of unacceptable behavior by contributors include:
+- Keep commits **small and self-contained**. A reviewer should be able to
+  reason about one commit at a time.
+- Reference the issue (`Closes #123`) in the PR description, not in every
+  commit subject.
 
-* The use of sexualized language or imagery and unwelcome sexual attention or advances
-* Trolling, insulting/derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or electronic
-  address, without explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+## Code style
 
-### Our Responsibilities
+- TypeScript is `strict`, with `noUnusedLocals` and
+  `exactOptionalPropertyTypes` on. Run `npx tsc --noEmit` before opening a
+  PR.
+- ESLint is configured via `next/core-web-vitals`. Run `npm run lint`.
+- Prettier handles formatting — `npx prettier --write .` if your editor
+  isn't already wired up.
+- Don't introduce new `console.*` calls; use `lib/logger.ts` instead.
+- Use the existing helpers in `lib/` for currency, dates, storage, and
+  fetching. If you're tempted to copy a pattern, extract it into `lib/`
+  first.
 
-Project maintainers are responsible for clarifying the standards of acceptable
-behavior and are expected to take appropriate and fair corrective action in
-response to any instances of unacceptable behavior.
+## Tests
 
-Project maintainers have the right and responsibility to remove, edit, or
-reject comments, commits, code, wiki edits, issues, and other contributions
-that are not aligned to this Code of Conduct, or to ban temporarily or
-permanently any contributor for other behaviors that they deem inappropriate, 
-disrespectful, threatening, offensive, or harmful.
+We don't yet have a runtime test runner. Until we do, prefer **compile-time
+assertions** in `lib/__tests__/*.test.ts` for helper behaviour — see
+`lib/__tests__/format.test.ts` for a worked example.
 
-### Scope
+## Pull request expectations
 
-This Code of Conduct applies both within project spaces and in public spaces
-when an individual is representing the project or its community. Examples of
-representing a project or community include using an official project e-mail
-address, posting via an official social media account, or acting as an appointed
-representative at an online or offline event. Representation of a project may be
-further defined and clarified by project maintainers.
+- CI must be green (`tsc`, `lint`, `build`).
+- `CHANGELOG.md` is updated for anything a user can observe.
+- New environment variables are documented in `.env.example`.
+- Screenshots/GIFs in the PR description for UI changes.
 
-### Enforcement
+## Reporting security issues
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [africommerce@gmail.com](mailto:ioreactplay@gmail.com). All
-complaints will be reviewed and investigated and will result in a response that
-is deemed necessary and appropriate to the circumstances. The project team is
-obligated to maintain confidentiality with regard to the reporter of an incident.
-Further details of specific enforcement policies may be posted separately.
-
-Project maintainers who do not follow or enforce the Code of Conduct in good
-faith may face temporary or permanent repercussions as determined by other
-members of the project's leadership.
-
-### Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
-available at [http://contributor-covenant.org/version/1/4][version]
-
-[homepage]: http://contributor-covenant.org
-[version]: http://contributor-covenant.org/version/1/4/
+Please do **not** open public issues for security bugs. See `SECURITY.md`
+for the responsible disclosure process.
