@@ -16,9 +16,12 @@ for (const info of [a, b, c, d, e, f]) {
   void [_amount, _status, _label, _color];
 }
 
-// Zero or non-numeric input collapses to the `out` state.
-const _outA: "out" = a.status;
-const _outD: "out" = d.status;
-const _outE: "out" = e.status;
-const _outF: "out" = f.status;
-void [_outA, _outD, _outE, _outF];
+// Zero or non-numeric input collapses to the `out` state — checked at
+// runtime rather than the type level since `parseStock` doesn't narrow.
+function expectOut(status: "out" | "low" | "in"): void {
+  if (status !== "out") throw new Error(`expected 'out', got '${status}'`);
+}
+expectOut(a.status);
+expectOut(d.status);
+expectOut(e.status);
+expectOut(f.status);
