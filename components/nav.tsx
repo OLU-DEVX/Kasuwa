@@ -34,7 +34,7 @@ import { useRouter } from "next/router";
 import logout from "../public/logout copy.svg";
 import ProductCard from "./productCard";
 import { useDebounce } from "@/lib/useDebounce";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORIES, ROUTES } from "@/lib/constants";
 
 export default function Nav() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -176,7 +176,7 @@ export default function Nav() {
               key="sign in"
             >
               {!user && (
-                <Link className="text-black w-full" href={"/auth/signIn"}>
+                <Link className="text-black w-full" href={ROUTES.signIn}>
                   <Button className="w-full text-white bg-[#A46E05BD] py-2 rounded-md">
                     Sign In
                   </Button>
@@ -190,7 +190,7 @@ export default function Nav() {
               key="sign up"
             >
               {!user && (
-                <Link className="text-black w-full" href={"/auth/signup"}>
+                <Link className="text-black w-full" href={ROUTES.signUp}>
                   <Button className="w-full bg-[#A46E05BD] text-white py-2 rounded-md">
                     Sign Up
                   </Button>
