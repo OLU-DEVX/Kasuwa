@@ -5,6 +5,9 @@ import { useRouter } from "next/router";
 import Bookmark from "@/components/bookmark";
 import ProductCard from "@/components/productCard";
 import ProductSkeletonLoader from "@/components/ProductSkeletonLoader";
+import { apiFetch } from "@/lib/api";
+import { formatNaira } from "@/lib/format";
+import { parseStock, stockColorClass, stockLabel } from "@/lib/stock";
 
 interface ProductInterface {
   images: any;
@@ -17,22 +20,22 @@ interface ProductInterface {
 
 export default function ProductInformation() {
   const [product, setProduct] = useState<ProductInterface | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { productInfo } = router.query;
   const { addToCart, list, count } = useContext(AppContext);
 
   const fetchProducts = useCallback(async () => {
-    const API_URL = "https://kasuwa-b671.onrender.com";
+    setIsLoading(true);
     try {
-      const productData = await fetch(
-        `${API_URL}/products/product/${productInfo}`
+      const data = await apiFetch<ProductInterface>(
+        `/products/product/${productInfo}`
       );
-      const productDataRes = await productData.json();
-      setProduct(productDataRes);
-      setIsLoading(false); // Set isLoading to false after data is fetched
-    } catch (error) {
-      setIsLoading(false); // Set isLoading to false on error
+      setProduct(data);
+    } catch {
+      setProduct(null);
+    } finally {
+      setIsLoading(false);
     }
   }, [productInfo]);
 
@@ -42,17 +45,7 @@ export default function ProductInformation() {
     }
   }, [productInfo, router.isReady, fetchProducts]);
 
-  const checkStock = () => {
-    if (product) {
-      if (parseFloat(product.stock) <= 20) {
-        return "Low in stock";
-      } else if (parseFloat(product.stock) > 20) {
-        return "In stock";
-      } else if (parseFloat(product.stock) < 1) {
-        return "Out of stock";
-      }
-    }
-  };
+  const stockInfo = product ? parseStock(product.stock) : null;
 
   return (
     <div>
@@ -85,8 +78,12 @@ export default function ProductInformation() {
                       }
                     ></Button>
                   </div>
-                  <p>₦{parseFloat(product.originalPrice).toLocaleString()}</p>
-                  <span>{checkStock()}</span>
+                  <p>{formatNaira(product.originalPrice)}</p>
+                  {stockInfo && (
+                    <span className={stockColorClass(stockInfo.status)}>
+                      {stockLabel(stockInfo.status)}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <Button
