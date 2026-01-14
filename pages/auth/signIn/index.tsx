@@ -1,15 +1,18 @@
-import { Button, Card, Spacer,Spinner } from "@nextui-org/react";
+import { Button, Card, Spacer, Spinner } from "@nextui-org/react";
 import React, { useState } from "react";
 import logo from "public/logo.svg";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { API_URL, ROUTES } from "@/lib/constants";
+import { writeJSON, StorageKeys } from "@/lib/storage";
+import type { User } from "@/lib/types";
 
-const API_BASE_URL = "https://kasuwa-b671.onrender.com/";
+type SignInStatus = "idle" | "loading" | "failed" | "network_error";
 
-export default function SignInForm (){
-  const [loading,setLoading]=useState("idle")
+export default function SignInForm() {
+  const [loading, setLoading] = useState<SignInStatus>("idle");
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -20,20 +23,33 @@ export default function SignInForm (){
     e.preventDefault();
     setLoading("loading");
     try {
-      const response = await axios.post(`${API_BASE_URL}users/login`, formData);
-      const userDetails=response.data.data
-      localStorage.setItem("user",JSON.stringify(userDetails))
+      const response = await axios.post<{ data: User }>(
+        `${API_URL}/users/login`,
+        formData
+      );
+      writeJSON<User>(StorageKeys.user, response.data.data);
       router.back();
     } catch (error) {
-      setLoading("failed");
+      if (axios.isAxiosError(error) && !error.response) {
+        setLoading("network_error");
+      } else {
+        setLoading("failed");
+      }
     }
   };
 
   const renderLoadingUI = () => {
-    if(loading==="idle"){
-      return <div>Sign In</div>
-    }else if (loading === "loading") {
-      return <div className="flex justify-center items-center gap-1"><Spinner className="z-50" size="md" color="default"/>Signing In...</div>;
+    if (loading === "idle") {
+      return <div>Sign In</div>;
+    } else if (loading === "loading") {
+      return (
+        <div className="flex justify-center items-center gap-1">
+          <Spinner className="z-50" size="md" color="default" />
+          Signing In...
+        </div>
+      );
+    } else if (loading === "network_error") {
+      return <div>Network error. Check your connection and try again.</div>;
     } else if (loading === "failed") {
       return <div>Sign in failed. Please try again.</div>;
     }
@@ -98,9 +114,9 @@ export default function SignInForm (){
               <Spacer y={2} />
 
               <div className="text-end">
-                <a href="#" className="text-[#38B419]">
+                <Link href={ROUTES.forgotPassword} className="text-[#38B419]">
                   Forgot password?
-                </a>
+                </Link>
               </div>
 
               <Spacer y={2} />
@@ -134,7 +150,7 @@ export default function SignInForm (){
             <p>
               Don't have an account? 
 
-              <Link href="/auth/signup" className="text-[#38B419]">
+              <Link href={ROUTES.signUp} className="text-[#38B419]">
                 {" "}Sign up
                
               </Link>
