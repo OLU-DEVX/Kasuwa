@@ -14,9 +14,8 @@ import {
 } from "@nextui-org/react";
 import { useContext } from "react";
 import { AppContext } from "@/utils/AppContext";
-import ProductCard from "@/components/productCard";
 import Flash from "../public/flash.svg";
-import SkeletonLoading from "@/components/skeletonLoading";
+import ProductGrid from "@/components/ProductGrid";
 import { useCountdown } from "@/lib/useCountdown";
 import { StorageKeys } from "@/lib/storage";
 import { pad2 } from "@/lib/format";
@@ -209,36 +208,7 @@ export default function Home() {
         </div>
       </div>
       <div className=" grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))]  w-full gap-x-[1.50rem] gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto ">
-        {list && list.length > 0 ? (
-          list.map(
-            (
-              items: {
-                name: string;
-                images: any;
-                originalPrice: string;
-                saleScale: string;
-                title: string;
-                _id:string
-                stock:string
-              },
-              index: number
-            ) => (
-              <ProductCard
-              stock={items.stock}
-              _id={items._id}
-                item={items}
-                key={index}
-                src={items.images[0].url}
-                index={index}
-                originalPrice={items.originalPrice}
-                title={items.name}
-                count={count}
-              />
-            )
-          )
-        ) : (
-          <SkeletonLoading />
-        )}
+        <ProductGrid items={list} count={count} />
       </div>
       <div className="w-full bg-[#F20E0E]">
         <div className="max-w-[1280px] mx-auto  gap-8    flex justify-between text-white scroll-parent">
@@ -272,37 +242,7 @@ export default function Home() {
         </div>
       </div>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))]  w-full gap-x-[1.50rem] gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto  ">
-       
-        {list && list.length > 0 ? (
-          list.slice(3, 8).map(
-            (
-              items: {
-                name: string;
-                images: any;
-                originalPrice: string;
-                saleScale: string;
-                title: string;
-                _id:string
-                stock:string
-              },
-              index: number
-            ) => (
-              <ProductCard
-              stock={items.stock}
-              _id={items._id}
-                item={items}
-                key={index}
-                src={items.images[0].url}
-                index={index}
-                originalPrice={items.originalPrice}
-                title={items.name}
-                count={count}
-              />
-            )
-          )
-        ) : (
-          <SkeletonLoading />
-        )}
+        <ProductGrid items={list} count={count} slice={[3, 8]} />
       </div>
       <div className="flex flex-col w-full max-w-[1280px] mx-auto  py-10 gap-2">
         <span className="text-[27px] font-semibold px-6">
@@ -310,36 +250,7 @@ export default function Home() {
           Most Searched Product
         </span>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))]  w-full gap-x-[1.50rem] justify-between gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto ">
-          {list&& list.length > 0  ? (
-            list.slice(1, 6).map(
-              (
-                items: {
-                  name: string;
-                  images: any;
-                  originalPrice: string;
-                  saleScale: string;
-                  title: string;
-                  _id:string;
-                  stock:string
-                },
-                index: number
-              ) => (
-                <ProductCard
-                stock={items.stock}
-                _id={items._id}
-                  item={items}
-                  key={index}
-                  src={items.images[0].url}
-                  index={index}
-                  originalPrice={items.originalPrice}
-                  title={items.name}
-                  count={count}
-                />
-              )
-            )
-          ) : (
-            <SkeletonLoading />
-          )}
+          <ProductGrid items={list} count={count} slice={[1, 6]} />
         </div>
       </div>
     </div>
