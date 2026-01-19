@@ -12,11 +12,10 @@ import {
   useDisclosure,
   Input,
 } from "@nextui-org/react";
-import ProductCard from "@/components/productCard";
 import Cartitem from "@/components/cartItem";
 import { useRouter } from "next/router";
 
-import SkeletonLoading from "@/components/skeletonLoading";
+import ProductGrid from "@/components/ProductGrid";
 import EmptyState from "@/components/EmptyState";
 
 import { usePaystackPayment } from "react-paystack";
@@ -244,35 +243,7 @@ export default function Cart() {
           Most Searched Product
         </span>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))]  w-full gap-x-[1.50rem] gap-y-4 pt-10 max-w-[1280px] px-6 py-10 mx-auto ">
-          {list && list.length > 0 ? (
-            list.slice(1, 6).map(
-              (
-                items: {
-                  images: any;
-                  originalPrice: string;
-                  saleScale: string;
-                  name: string;
-                  _id: string;
-                  stock:string
-                },
-                index: number
-              ) => (
-                <ProductCard
-                stock={items.stock}
-                  _id={items._id}
-                  item={items}
-                  key={index}
-                  src={items.images[0].url}
-                  index={index}
-                  originalPrice={items.originalPrice}
-                  title={items.name}
-                  count={count}
-                />
-              )
-            )
-          ) : (
-            <SkeletonLoading />
-          )}
+          <ProductGrid items={list} count={count} slice={[1, 6]} />
         </div>
       </div>
     </div>
