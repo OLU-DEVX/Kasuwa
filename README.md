@@ -1,127 +1,138 @@
-🌾 Kasuwa — Open Source eFarm Marketplace
-Kasuwa is an open-source eFarm web platform designed to empower farm owners to sell their agricultural products directly to farmers, vendors, and everyday users, fostering fresh produce accessibility and supporting local agriculture through digital innovation.
-Built with Next.js, Kasuwa leverages modern web technologies to create a seamless and scalable marketplace.
+# 🌾 Kasuwa — Open Source eFarm Marketplace
 
-🚀 Features
+Kasuwa is an open-source eFarm web platform designed to empower farm
+owners to sell their agricultural products directly to farmers, vendors,
+and everyday users — fostering fresh-produce accessibility and supporting
+local agriculture through digital innovation.
 
-🧑‍🌾 Farm Owner Dashboard: List, manage, and update agricultural products with ease.
-🛒 Product Marketplace: Browse and purchase fresh produce directly from farmers.
-🔍 Search & Filtering: Advanced product search with category and location-based filtering.
-🧾 Secure Checkout: Integrated payment and order processing system (in development).
-🌍 Local & National Sales: Support for regional and nationwide product distribution.
-📱 Responsive Design: Optimized for mobile, tablet, and desktop devices.
+Built with **Next.js 13** (pages router), **NextUI**, and **Tailwind CSS**,
+Kasuwa is a single-page marketplace that talks to a separate REST backend
+and uses Paystack for checkout.
 
+## 🚀 Features
 
-🛠️ Tech Stack
+- 🧑‍🌾 **Farm Owner Dashboard** — list, manage, and update agricultural
+  products with ease.
+- 🛒 **Product Marketplace** — browse and purchase fresh produce directly
+  from farmers.
+- 🔍 **Search & Filtering** — debounced product search with category and
+  location-based filtering.
+- 🧾 **Secure Checkout** — Paystack integration for order processing.
+- 🎟️ **Discount Codes** — built-in promo codes (`WELCOME10`,
+  `FREESHIP`, `BULK5`) with min-subtotal gating.
+- ⏱️ **Persistent Countdowns** — flash-sale and special-offer timers that
+  survive page refreshes.
+- 📱 **Responsive Design** — optimised for mobile, tablet, and desktop.
+- ♿ **Accessible** — keyboard-operable bookmarks, labelled controls, live
+  region toasts.
 
-Framework: Next.js 14 (App Router)
-Styling: Tailwind CSS for rapid, responsive design
-Backend: Next.js API Routes for server-side logic
-Database: PostgreSQL (planned, with Prisma ORM integration)
-Authentication: NextAuth.js (planned for secure user management)
-Deployment: Vercel for seamless hosting
-Other Tools: ESLint, Prettier, Husky (for code quality)
+## 🛠️ Tech Stack
 
+| Layer        | Tooling                                                      |
+|--------------|--------------------------------------------------------------|
+| Framework    | Next.js 13 (pages router)                                    |
+| Styling      | Tailwind CSS + NextUI                                        |
+| State        | React Context (`utils/AppContext.tsx`), `localStorage`       |
+| Networking   | `lib/api.ts` — typed `fetch` with timeout + retry            |
+| Payments     | Paystack (`react-paystack`)                                  |
+| Tooling      | ESLint, Prettier, `.editorconfig`, `.nvmrc` (Node 20)        |
 
-🧑‍💻 Getting Started
-Follow these steps to set up and run Kasuwa locally:
-Prerequisites
+## 🧑‍💻 Getting Started
 
-Node.js (v18 or higher)
-npm or Yarn
-Git
+### Prerequisites
 
-Installation
+- **Node.js v20+** (use `nvm use` to pick up `.nvmrc`)
+- npm or Yarn
+- Git
 
-Clone the Repository
-git clone https://github.com/your-username/kasuwa.git
-cd kasuwa
+### Installation
 
+```bash
+# Clone the repository
+git clone https://github.com/OLU-DEVX/Kasuwa.git
+cd Kasuwa
 
-Install Dependencies
+# Install dependencies
 npm install
-# or
-yarn install
 
+# Copy env template
+cp .env.example .env.local
 
-Set Up Environment VariablesCreate a .env.local file in the root directory and add the following:
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-# Add database or other environment variables here (e.g., DATABASE_URL)
-
-
-Run the Development Server
+# Start the dev server
 npm run dev
-# or
-yarn dev
+```
 
+Open http://localhost:3000 to see the marketplace home page.
 
-Open the ApplicationNavigate to http://localhost:3000 in your browser to explore Kasuwa.
+### Available scripts
 
+| Command                | What it does                                        |
+|------------------------|-----------------------------------------------------|
+| `npm run dev`          | Start the Next.js dev server with hot reload       |
+| `npm run build`        | Production build                                    |
+| `npm start`            | Run the production server (after `build`)           |
+| `npm run lint`         | Lint the codebase with `next lint`                  |
+| `npm run lint:fix`     | Auto-fix lint issues                                |
+| `npm run typecheck`    | `tsc --noEmit`                                      |
+| `npm run format`       | Format every file with Prettier                     |
+| `npm run format:check` | Check formatting without writing                    |
 
+## ⚙️ Environment variables
 
-📁 Project Structure
+Copy `.env.example` to `.env.local` and set whatever overrides you need:
+
+| Variable                          | Purpose                                |
+|-----------------------------------|----------------------------------------|
+| `NEXT_PUBLIC_API_URL`             | Base URL of the Kasuwa REST backend    |
+| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key (safe in browser)  |
+| `NEXT_PUBLIC_DELIVERY_FEE`        | Standard delivery fee in NGN           |
+
+## 📁 Project Structure
+
+```
 kasuwa/
-├── app/                    # Next.js App Router (pages, API routes)
-├── components/             # Reusable React components
-├── lib/                   # Utility functions and helpers
-├── public/                # Static assets (images, fonts, etc.)
-├── styles/                # Tailwind CSS and global styles
-├── .env.local             # Environment variables (not tracked)
-├── prisma/                # Prisma schema (planned for database)
-├── README.md              # Project documentation
-└── package.json           # Project dependencies and scripts
+├── app/                  # Tailwind/global CSS only
+├── components/           # Reusable React components
+├── lib/                  # Framework-agnostic helpers
+│   ├── api.ts            # Typed fetch wrapper
+│   ├── constants.ts      # API URL, routes, limits
+│   ├── format.ts         # NGN currency, duration
+│   ├── pricing.ts        # Order totals
+│   ├── discount.ts       # Promo code resolver
+│   ├── storage.ts        # SSR-safe localStorage
+│   ├── stock.ts          # Stock parser/labels
+│   ├── useCountdown.ts   # Persistent countdown
+│   ├── useDebounce.ts    # Search debounce
+│   ├── useMediaQuery.ts  # Breakpoint hook
+│   └── __tests__/        # Compile-time test assertions
+├── pages/                # Next.js pages router
+├── public/               # Static SVG/PNG assets
+└── utils/                # Legacy helpers + AppContext
+```
 
+See `ARCHITECTURE.md` for a deeper walkthrough.
 
-⚙️ Database Setup (Coming Soon)
-Kasuwa will use PostgreSQL with Prisma ORM for database management. To set up the database:
+## 🤝 Contributing
 
-Install PostgreSQL locally or use a cloud provider (e.g., Supabase, Neon).
-Update the .env.local file with your DATABASE_URL.
-Run migrations (once implemented):npx prisma migrate dev
+We welcome contributions! Start with `CONTRIBUTING.md` for the commit
+conventions, branch naming, and PR expectations. Bug reports and feature
+requests have dedicated templates under `.github/ISSUE_TEMPLATE/`.
 
+## 🔐 Security
 
+Found a vulnerability? Please read `SECURITY.md` and email us privately
+instead of opening a public issue.
 
-Stay tuned for detailed database setup instructions in future updates.
+## 📚 Learn More
 
-🤝 Contributing
-We welcome contributions from the community! To contribute:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [NextUI Documentation](https://nextui.org/docs)
+- [Paystack Inline Docs](https://paystack.com/docs/payments/accept-payments)
 
-Fork the RepositoryFork the project on GitHub and clone your fork locally.
-git clone https://github.com/your-username/kasuwa.git
+## 📄 License
 
+Kasuwa is open source and licensed under the MIT License — see `LICENSE`.
 
-Create a Feature Branch
-git checkout -b feature/your-feature-name
-
-
-Commit ChangesFollow conventional commit messages (e.g., feat: add product filtering).
-git commit -m "feat: add product filtering"
-
-
-Push and Open a Pull RequestPush your branch to your fork and open a PR against the main repository.
-
-
-Contributor Guidelines
-
-Follow the Code of Conduct (to be added).
-Ensure code is formatted with Prettier and linted with ESLint.
-Write clear, concise commit messages.
-Test your changes locally before submitting a PR.
-
-
-📚 Learn More
-
-Next.js Documentation
-Tailwind CSS Documentation
-Prisma Documentation
-Vercel Deployment Guide
-
-
-🌐 Community
-Join our Discord community to connect with other contributors, ask questions, and stay updated on Kasuwa's development.
-
-📄 License
-Kasuwa is open source and licensed under the MIT License.
-
-👨‍🌾 Built with ❤️ for Farmers
-By the Kasuwa team. Let's grow the future of agriculture together!
+👨‍🌾 Built with ❤️ for farmers. Let's grow the future of agriculture
+together!
