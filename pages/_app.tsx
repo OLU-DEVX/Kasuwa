@@ -134,15 +134,15 @@ function App({ Component, pageProps }: AppProps) {
         }}
       >
         <Head>
-          {/* Define metadata for the app */}
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <title>Kasuwa</title>
-          <link
-            rel="icon"
-            href="/icon.svg?<generated>"
-            type="image/<generated>"
-            sizes="<generated>"
+          <meta name="theme-color" content="#A46E05" />
+          <meta
+            name="description"
+            content="Kasuwa — the open-source eFarm marketplace connecting Nigerian farmers and buyers."
           />
+          <link rel="manifest" href="/manifest.json" />
+          <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+          <title>Kasuwa — Open Source eFarm Marketplace</title>
         </Head>
         {!router.pathname.includes("auth/") &&
           !router.pathname.includes("seller/sellerForm") && <Nav />}
