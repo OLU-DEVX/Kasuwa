@@ -5,6 +5,9 @@
     "@next/next/no-page-custom-font": "off",
     "react-hooks/exhaustive-deps": "warn",
     "no-unused-vars": "warn",
-    "no-console": "warn"
+    "no-console": "warn",
+    "prefer-const": "warn",
+    "eqeqeq": ["warn", "smart"],
+    "no-var": "warn"
   }
 }
