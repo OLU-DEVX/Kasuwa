@@ -219,20 +219,21 @@ export default function Footer() {
           <div className="flex justify-between flex-col sm:flex-row flex-wrap max-w-[650px] mx-auto sm:m-0 sm:pt-0 pt-10 sm:gap-0 gap-8 ">
             <div className="flex flex-col sm:m-0 m-m-auto sm:text-left text-center ">
               <span className="text-lg text-white font-semibold">JOIN US</span>
-              <div className="flex justify-normal items-center gap-4 sm:gap-3 w-fit sm:m-0 m-auto">
-                <Link href={"#"}>
-                  <Image src={facebook} alt="logo" width={25} height={15} />
+              <div
+                className="flex justify-normal items-center gap-4 sm:gap-3 w-fit sm:m-0 m-auto"
+                aria-label="Follow Kasuwa on social media"
+              >
+                <Link href={"#"} aria-label="Kasuwa on Facebook">
+                  <Image src={facebook} alt="" width={25} height={15} />
                 </Link>
-                <Link href={"#"}>
-                  <Image src={youtube} alt="logo" width={25} height={15} />
+                <Link href={"#"} aria-label="Kasuwa on YouTube">
+                  <Image src={youtube} alt="" width={25} height={15} />
                 </Link>
-                <Link href={"#"}>
-                  {" "}
-                  <Image src={instagram} alt="logo" width={25} height={15} />
+                <Link href={"#"} aria-label="Kasuwa on Instagram">
+                  <Image src={instagram} alt="" width={25} height={15} />
                 </Link>
-                <Link href={"#"}>
-                  {" "}
-                  <Image src={twitter} alt="logo" width={25} height={15} />
+                <Link href={"#"} aria-label="Kasuwa on Twitter">
+                  <Image src={twitter} alt="" width={25} height={15} />
                 </Link>
               </div>
             </div>
