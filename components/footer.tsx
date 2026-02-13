@@ -29,7 +29,7 @@ export default function Footer() {
               NEW TO KASUWA
             </span>
             <p className="text-white">
-              Suscribe to our newsletter and get notified about offers
+              Subscribe to our newsletter and get notified about offers
             </p>
             <div className="flex gap-1 max-w-[400px]">
               <Input
@@ -41,7 +41,7 @@ export default function Footer() {
                 placeholder="Enter your email address"
               />
               <Button className="text-white text-sm bg-[#A46E05BD] rounded-md py-2 px-4">
-                Suscribe
+                Subscribe
               </Button>
             </div>
           </div>
