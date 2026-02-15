@@ -187,7 +187,7 @@ export default function Home() {
           <div className="flex  bg-[#008837] rounded-md justify-between p-3 lg:h-[50%] w-full">
             <div className="flex-col flex">
               <span className="font-semibold text-xl">
-                The safety of your Money I Guaranteed
+                The safety of your money is guaranteed
               </span>
               <p className="text-sm">
                 Money is released to seller after order has been confirmed as
@@ -201,7 +201,9 @@ export default function Home() {
               <span className="font-semibold text-xl">
                 Delivery to your doorstep
               </span>
-              <p className="text-sm">Products are delivery to your door step</p>
+              <p className="text-sm">
+                Products are delivered to your doorstep
+              </p>
             </div>
             <Image src={fruitGrp} width={90} height={70} alt="" />
           </div>
