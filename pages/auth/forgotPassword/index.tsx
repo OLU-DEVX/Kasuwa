@@ -1,9 +1,31 @@
 import { Button, Spacer } from "@nextui-org/react";
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
+import { ROUTES } from "@/lib/constants";
+import { isValidEmail } from "@/lib/validate";
 
 const ForgotPasswordForm: React.FC = () => {
-  const handleSignUp = () => {
-    // Handle form submission 
+  const [identifier, setIdentifier] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const trimmed = identifier.trim();
+    if (!trimmed) {
+      setError("Enter your email or phone number to continue.");
+      return;
+    }
+    // Accept either an email or anything roughly phone-shaped; the backend
+    // will do strict validation on its side.
+    if (trimmed.includes("@") && !isValidEmail(trimmed)) {
+      setError("That email address looks malformed.");
+      return;
+    }
+
+    setSubmitted(true);
   };
 
   return (
@@ -11,8 +33,7 @@ const ForgotPasswordForm: React.FC = () => {
       <div>
         <h2 className="text-center font-semibold text-3xl">Forgot Password?</h2>
         <div className="my-4">
-          <form className="w-[500px] mt-5" onSubmit={handleSignUp}>
-
+          <form className="w-[500px] mt-5" onSubmit={handleSubmit}>
             <div className="mb-6">
               <label htmlFor="emailOrPhone" className="block mb-2">
                 Email or Phone Number
@@ -22,9 +43,22 @@ const ForgotPasswordForm: React.FC = () => {
                 name="emailOrPhone"
                 type="text"
                 required
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 className="border border-[#A46E05] rounded h-12 px-3 w-full focus:outline-none focus:border-[#A46E05]"
               />
             </div>
+
+            {error && (
+              <p className="text-sm text-red-500 mb-3" role="alert">
+                {error}
+              </p>
+            )}
+            {submitted && !error && (
+              <p className="text-sm text-green-600 mb-3" role="status">
+                If an account exists, we&apos;ve sent a reset link.
+              </p>
+            )}
 
             <Button
               type="submit"
@@ -46,9 +80,9 @@ const ForgotPasswordForm: React.FC = () => {
         <div className="text-center mt-5">
           <p>
             Have an account?{" "}
-            <a href="#" className="text-[#38B419]">
+            <Link href={ROUTES.signIn} className="text-[#38B419]">
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
