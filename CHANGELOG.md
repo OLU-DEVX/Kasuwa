@@ -41,3 +41,20 @@ once we cut a `1.0.0` release.
 
 - `decreaseQuantity` in `_app.tsx` no longer lets cart quantities fall below
   one.
+- `pages/savedItems` previously compared the array itself with `<= 0` to
+  show the empty state — now it correctly checks `.length`.
+- Cart-item quantity controls clamp to the available stock so users can't
+  request more than is on offer.
+- "Suscribe" → "Subscribe" in the footer newsletter form.
+- Home page promo copy: "delivery to your door step" and "Money I
+  Guaranteed" fixed.
+
+### Documentation
+
+- Brand-new `README.md` with scripts, env vars, structure, and feature
+  list.
+- `CONTRIBUTING.md` rewritten with branch/commit conventions and PR
+  checklist.
+- New `ARCHITECTURE.md`, `SECURITY.md`, and `CHANGELOG.md`.
+- GitHub PR template, bug-report and feature-request issue templates,
+  `CODEOWNERS`.
